@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "844098886064",
+    "project_id": "flutter-login-and-regist-53ee1",
+    "storage_bucket": "flutter-login-and-regist-53ee1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844098886064:android:6f70a4f6bad93ed0ae1e75",
+        "android_client_info": {
+          "package_name": "com.example.flutter_login_and_register"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "844098886064-uhduv1jj6sd00fo9npspshn9l7dns0vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-_T3X4mMEWQHWvX8lMpINa8Yfcct3j0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "844098886064-uhduv1jj6sd00fo9npspshn9l7dns0vc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "844098886064-7ftjqdji1bvctj3sic9koq58fbt33qi9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterLoginAndRegister"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
