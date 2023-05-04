@@ -12,8 +12,10 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool isLoading = false;
 
   String? emailErrorText;
   String? passwordErrorText;
@@ -41,13 +43,46 @@ class _LoginState extends State<Login> {
     passwordController.dispose();
   }
 
-  void onLogin() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-      ),
-    );
+  void onLogin() async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (_formKey.currentState!.validate()) {
+      try {
+        final credential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Home(),
+          ),
+        );
+      } on FirebaseAuthException catch (e) {
+        print(e.code);
+
+        ///
+        if (e.code == 'user-not-found') {
+          setState(() {
+            emailErrorText = 'No user found for that email.';
+          });
+        } else if (e.code == 'wrong-password') {
+          setState(() {
+            passwordErrorText = 'Wrong password provided for that user.';
+          });
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void onRegister() {
@@ -80,40 +115,78 @@ class _LoginState extends State<Login> {
                 const SizedBox(
                   height: 60,
                 ),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Email',
-                    isDense: true,
-                    errorText: emailErrorText,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Password',
-                    isDense: true,
-                    errorText: passwordErrorText,
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(
-                  height: 24,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-                    onPressed: onLogin,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 13),
-                      child: Text('Next'),
-                    ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: emailController,
+                        onChanged: (value) {
+                          setState(() {
+                            emailErrorText = null;
+                          });
+                        },
+                        validator: (value) {
+                          if (value?.isEmpty ?? false) {
+                            return 'Email is required';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: 'Email',
+                          isDense: true,
+                          errorText: emailErrorText,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      TextFormField(
+                        controller: passwordController,
+                        onChanged: (value) {
+                          setState(() {
+                            passwordErrorText = null;
+                          });
+                        },
+                        validator: (value) {
+                          if (value?.isEmpty ?? false) {
+                            return 'Password is required';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: 'Password',
+                          isDense: true,
+                          errorText: passwordErrorText,
+                        ),
+                        obscureText: true,
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              elevation: MaterialStateProperty.all(0)),
+                          onPressed: onLogin,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Next'),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(

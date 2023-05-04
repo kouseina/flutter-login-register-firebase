@@ -168,14 +168,14 @@ class _RegisterState extends State<Register> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       child: isLoading
-                          ? SizedBox(
+                          ? const SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                               ),
                             )
-                          : Text('Next'),
+                          : const Text('Next'),
                     ),
                   ),
                 ),
