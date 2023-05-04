@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_login_and_register/home.dart';
@@ -11,13 +12,13 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final passwordConfirmController = TextEditingController();
+  bool isLoading = false;
 
   String? emailErrorText;
   String? passwordErrorText;
-  String? passwordConfirmErrorText;
 
   @override
   void initState() {
@@ -34,13 +35,48 @@ class _RegisterState extends State<Register> {
     passwordController.dispose();
   }
 
-  void onRegister() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-      ),
-    );
+  void onRegister() async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (_formKey.currentState!.validate()) {
+      try {
+        final credential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Home(),
+          ),
+        );
+      } on FirebaseAuthException catch (e) {
+        print(e.code);
+
+        ///
+        if (e.code == 'weak-password') {
+          setState(() {
+            passwordErrorText = 'The password provided is too weak.';
+          });
+        } else if (e.code == 'email-already-in-use') {
+          setState(() {
+            emailErrorText = 'The account already exists for that email.';
+          });
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -71,41 +107,56 @@ class _RegisterState extends State<Register> {
                 const SizedBox(
                   height: 60,
                 ),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Email',
-                    isDense: true,
-                    errorText: emailErrorText,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Password',
-                    isDense: true,
-                    errorText: passwordErrorText,
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TextFormField(
-                  controller: passwordConfirmController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Confirm Password',
-                    isDense: true,
-                    errorText: passwordConfirmErrorText,
-                  ),
-                  obscureText: true,
-                ),
+                Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: emailController,
+                          onChanged: (value) {
+                            setState(() {
+                              emailErrorText = null;
+                            });
+                          },
+                          validator: (value) {
+                            if (value?.isEmpty ?? false) {
+                              return 'Email is required';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            labelText: 'Email',
+                            isDense: true,
+                            errorText: emailErrorText,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        TextFormField(
+                          controller: passwordController,
+                          onChanged: (value) {
+                            setState(() {
+                              passwordErrorText = null;
+                            });
+                          },
+                          validator: (value) {
+                            if (value?.isEmpty ?? false) {
+                              return 'Password is required';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            labelText: 'Password',
+                            isDense: true,
+                            errorText: passwordErrorText,
+                          ),
+                          obscureText: true,
+                        ),
+                      ],
+                    )),
                 const SizedBox(
                   height: 24,
                 ),
@@ -114,9 +165,17 @@ class _RegisterState extends State<Register> {
                   child: ElevatedButton(
                     style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
                     onPressed: onRegister,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 13),
-                      child: Text('Next'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      child: isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text('Next'),
                     ),
                   ),
                 ),

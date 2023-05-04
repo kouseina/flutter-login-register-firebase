@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_and_register/home.dart';
 import 'package:flutter_login_and_register/register.dart';
@@ -20,6 +22,14 @@ class _LoginState extends State<Login> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
   }
 
   @override

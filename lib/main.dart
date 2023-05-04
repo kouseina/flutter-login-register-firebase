@@ -4,9 +4,8 @@ import 'package:flutter_login_and_register/firebase_options.dart';
 import 'package:flutter_login_and_register/login.dart';
 
 void main() async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const App());
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_and_register/login.dart';
 
@@ -11,7 +12,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    void onLogout() {
+    void onLogout() async {
+      await FirebaseAuth.instance.signOut();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
