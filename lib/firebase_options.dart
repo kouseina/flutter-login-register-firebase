@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -58,5 +55,15 @@ class DefaultFirebaseOptions {
     messagingSenderId: '844098886064',
     projectId: 'flutter-login-and-regist-53ee1',
     storageBucket: 'flutter-login-and-regist-53ee1.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCD6aec5o5hr3oTqDeJMhbPfgBU9uzK_n0',
+    appId: '1:844098886064:ios:e28e332c4c910423ae1e75',
+    messagingSenderId: '844098886064',
+    projectId: 'flutter-login-and-regist-53ee1',
+    storageBucket: 'flutter-login-and-regist-53ee1.appspot.com',
+    iosClientId: '844098886064-7ftjqdji1bvctj3sic9koq58fbt33qi9.apps.googleusercontent.com',
+    iosBundleId: 'com.example.flutterLoginAndRegister',
   );
 }
