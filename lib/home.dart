@@ -77,16 +77,23 @@ class _HomeState extends State<Home> {
                 const SizedBox(
                   height: 16,
                 ),
-                Text('Role : ${userData['role'] ?? ''}'),
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Welcome',
-                          style: TextStyle(fontSize: 32),
+                        Text(
+                          'Welcome, ${userData['name']}!',
+                          style: const TextStyle(fontSize: 32),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Text(
+                          userData['role'],
+                          style: const TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(
                           height: 40,

@@ -35,7 +35,7 @@ class _LoginState extends State<Login> {
             builder: (context) => const Home(),
           ),
         );
-        
+
         print('User is signed in!');
       }
     });

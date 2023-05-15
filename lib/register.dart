@@ -15,6 +15,7 @@ final List<String> roleList = <String>['Admin', 'User'];
 class _RegisterState extends State<Register> {
   final db = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -22,6 +23,7 @@ class _RegisterState extends State<Register> {
 
   bool isLoading = false;
 
+  String? nameErrorText;
   String? emailErrorText;
   String? passwordErrorText;
 
@@ -36,6 +38,7 @@ class _RegisterState extends State<Register> {
     // TODO: implement dispose
     super.dispose();
 
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
   }
@@ -56,6 +59,7 @@ class _RegisterState extends State<Register> {
         );
 
         final user = <String, dynamic>{
+          "name": nameController.value.text,
           "email": emailController.value.text,
           "role": roleValue
         };
@@ -122,7 +126,7 @@ class _RegisterState extends State<Register> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height / 5,
+                  height: MediaQuery.of(context).size.height / 7,
                 ),
                 const Text(
                   'Register',
@@ -135,6 +139,29 @@ class _RegisterState extends State<Register> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        TextFormField(
+                          controller: nameController,
+                          onChanged: (value) {
+                            setState(() {
+                              nameErrorText = null;
+                            });
+                          },
+                          validator: (value) {
+                            if (value?.isEmpty ?? false) {
+                              return 'Name is required';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            labelText: 'Name',
+                            isDense: true,
+                            errorText: nameErrorText,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
                         TextFormField(
                           controller: emailController,
                           onChanged: (value) {
