@@ -1,8 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_login_and_register/home.dart';
-import 'package:flutter_login_and_register/register.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -11,10 +10,16 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
+final List<String> roleList = <String>['Admin', 'User'];
+
 class _RegisterState extends State<Register> {
+  final db = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  String roleValue = roleList.first;
+
   bool isLoading = false;
 
   String? emailErrorText;
@@ -50,14 +55,33 @@ class _RegisterState extends State<Register> {
           password: passwordController.text,
         );
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const Home(),
-          ),
-        );
+        final user = <String, dynamic>{
+          "email": emailController.value.text,
+          "role": roleValue
+        };
+
+        await db.collection('users').add(user).then((doc) {
+          print('DocumentSnapshot added with ID: ${doc.id}');
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Register success'),
+            ),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Home(),
+            ),
+          );
+        });
       } on FirebaseAuthException catch (e) {
         print(e.code);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(e.message ?? ''),
+        ));
 
         ///
         if (e.code == 'weak-password') {
@@ -130,6 +154,57 @@ class _RegisterState extends State<Register> {
                             isDense: true,
                             errorText: emailErrorText,
                           ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Stack(
+                          children: [
+                            Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              width: double.infinity,
+                              child: ButtonTheme(
+                                alignedDropdown: true,
+                                child: DropdownButton<String>(
+                                  value: roleValue,
+                                  icon: const Icon(Icons.arrow_drop_down),
+                                  isExpanded: true,
+                                  elevation: 16,
+                                  underline: const SizedBox(),
+                                  onChanged: (String? value) {
+                                    // This is called when the user selects an item.
+                                    setState(() {
+                                      roleValue = value!;
+                                    });
+                                  },
+                                  items: roleList.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    },
+                                  ).toList(),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              color: Colors.white,
+                              transform: Matrix4.translationValues(10, -6, 0),
+                              child: const Text(
+                                'Role',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            )
+                          ],
                         ),
                         const SizedBox(
                           height: 16,

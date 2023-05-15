@@ -29,6 +29,13 @@ class _LoginState extends State<Login> {
       if (user == null) {
         print('User is currently signed out!');
       } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Home(),
+          ),
+        );
+        
         print('User is signed in!');
       }
     });
@@ -56,6 +63,12 @@ class _LoginState extends State<Login> {
             .signInWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login success'),
+          ),
+        );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -64,6 +77,12 @@ class _LoginState extends State<Login> {
         );
       } on FirebaseAuthException catch (e) {
         print(e.code);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? ''),
+          ),
+        );
 
         ///
         if (e.code == 'user-not-found') {
